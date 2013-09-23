@@ -1,8 +1,7 @@
 browser.js v0.1
 ==========
 
-最靠谱的浏览器嗅探方式
---------------------------------------
+### 最靠谱的浏览器嗅探方式
 ```bash
 browser("msie <= 7"); //IE5\IE6\IE7中返回true
 browser("msie || webkit"); IE下或者webkit浏览器下返回true
@@ -19,8 +18,7 @@ browser("TaoBrowser"); //淘宝浏览器急速模式
 browser("Coolnovo"); //枫树浏览器高速模式
 ```
 
-特性：
---------------------------------------
-1. 大小写不敏感，参数中的浏览器名或内核名大小写均可
-2. 遵循define.amd标准，注册为其匿名模块
-2. 没有define.amd时优先注册为$.browser或者window.browser
+### 特性：
+- 大小写不敏感，参数中的浏览器名或内核名大小写均可
+- 遵循define.amd标准，注册为其匿名模块
+- 没有define.amd时优先注册为$.browser或者window.browser
