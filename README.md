@@ -6,6 +6,8 @@ browser.js v0.1
 browser("msie <= 7"); //IE5\IE6\IE7中返回true
 browser("msie || webkit"); IE下或者webkit浏览器下返回true
 
+browser("Safari > 5.1.2"); //内建版本号比较
+
 browser("Webkit"); //Chrome或Safari下返回webkit版本号，其他返回undefined
 browser("Safari"); //Safari下返回Safari版本号，其他返回undefined
 browser("Chrome"); //Chrome下返回Chrome版本号，其他返回undefined
