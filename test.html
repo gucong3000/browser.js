@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv = "X-UA-Compatible" content = "IE=edge,chrome=1">
+<meta charset="utf-8">
+<title>browser.js</title>
+</head>
+
+<body>
+<script src="browser.min.js"></script>
+<script>
+function tester(exp, name){
+	var info = browser(exp);
+	if(info){
+		document.writeln((name || exp) + "\t" + info + "<br>");
+	}
+}
+
+tester("msie", "IE 文档模式");
+tester("version", "IE 版本号");
+tester("Gecko");
+if(browser("Opera && Chrome")){
+	tester("Opera", "新版 Opera (Chrome内核)");
+} else if(browser("Opera && Presto")){
+	tester("Opera", "老版 Opera (Presto内核)");
+	tester("Presto");
+}
+tester("Webkit");
+tester("Safari");
+tester("Chrome");
+tester("Sogou", "搜狗高速模式");
+tester("Liebao", "猎豹高速模式");
+tester("Maxthon", "遨游高速模式");
+tester("TheWorld", "世界之窗高速模式");
+tester("TaoBrowser", "淘宝浏览器急速模式");
+tester("Coolnovo", "枫树浏览器高速模式");
+
+if(window.console){
+	console.log(browser());
+}
+</script>
+</body>
+</html>
