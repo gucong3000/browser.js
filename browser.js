@@ -1,4 +1,4 @@
-/* browser.js v0.1
+/* browser.js v0.2
  * https://github.com/gucong3000/browser.js
  */
 /*
@@ -47,6 +47,7 @@
 		nav = win.navigator,
 		doc = win.document,
 		documentMode = doc.documentMode,
+		lang = "language",
 		result = {},
 		expression;
 
@@ -55,10 +56,9 @@
 		//IE11不支持条件编译，所以采用documentMode > 10来判断
 		(function(){
 			expression = function(exp){
-				exp = exp.replace(/\b[\w\.]+\b/ig, function(name){
+				return exp.replace(/\b(?!(true|false))[\w\.]+\b/ig, function(name){
 					return result[name.toLowerCase()] || "undefined";
 				});
-				return new Function("return " + exp)();
 			};
 
 			//IE版本，msie为文档模式，version为浏览器版本
@@ -67,9 +67,6 @@
 			result.version = documentMode ? (jscript > 8 ? jscript : ( jscript ? 8 : documentMode)) : (compatMode ? "XMLHttpRequest" in win ? 7 : 6 : 5);
 			result.msie = documentMode || (compatMode === "CSS1Compat" ? result.version : 5);
 
-			//修复浏览器差异，标准浏览器应该有navigator.language属性
-			nav.language || (nav.language = nav.userLanguage);
-
 		})();
 	} else {
 		(function(){
@@ -77,7 +74,7 @@
 				ua = nav.userAgent;
 
 			expression = function(exp){
-				exp = exp.replace(/\b[a-z]+\b/ig, function(name){
+				return exp.replace(/\b(?!(true|false))[a-z]+\b/ig, function(name){
 					return result[name.toLowerCase()];
 				}).replace(/\b([\d\.]+)\s*([>=<]+)\s*([\d\.]+)\b/ig,function(exp){
 					
@@ -89,7 +86,6 @@
 				}).replace(/\d+(\.\d+)+/g, function(ver){
 					return '"' + ver + '"';
 				});
-				return new Function("return " + exp)();
 			};
 
 			//比较两个版本号，v1>v2则返回值大于零 v1<v2则返回值大于0，若v1==v2则返回值等于0
@@ -177,7 +173,10 @@
 			}
 		})();
 	}
+
+	result[lang] = nav[lang] || nav.userLanguage;
+
 	return function(exp){
-		return exp ? ((exp = exp.toLowerCase()) in result ? result[exp] :( result[exp] = expression(exp))) : result;
+		return exp ? ((exp = exp.toLowerCase()) in result ? result[exp] :( result[exp] = new Function("return " + expression(exp))())) : result;
 	};
 }));
