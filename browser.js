@@ -77,12 +77,7 @@
 				return exp.replace(/\b(?!(true|false))[a-z]+\b/ig, function(name){
 					return result[name.toLowerCase()];
 				}).replace(/\b([\d\.]+)\s*([>=<]+)\s*([\d\.]+)\b/ig,function(exp){
-					
-					console.log(exp);
-					console.dir(RegExp.lastMatch);
-					console.log(RegExp.$1);
-					exp = compare(RegExp.$1, RegExp.$3);
-					return exp + RegExp.$2 + "0";
+					return compare(RegExp.$1, RegExp.$3) + RegExp.$2 + "0";
 				}).replace(/\d+(\.\d+)+/g, function(ver){
 					return '"' + ver + '"';
 				});
