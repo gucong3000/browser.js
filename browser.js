@@ -1,4 +1,4 @@
-/* browser.js v0.2
+/* browser.js v0.3
  * https://github.com/gucong3000/browser.js
  */
 /*
@@ -33,9 +33,10 @@
 	tester("Coolnovo", "枫树浏览器高速模式");
 	console.log(browser());
  */
+"use strict";
 (function (root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
+	if (typeof define === 'function' && ( define.amd || define.cmd )) {
+		// AMD. CMD. Register as an anonymous module.
 		define(factory);
 	} else {
 		// Browser globals
