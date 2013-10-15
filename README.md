@@ -44,7 +44,7 @@ browser("Coolnovo");	//枫树浏览器高速模式true
 ### 特性：
 - 支持IE5-IE11、Webkit、gecko、Presto内核浏览器
 - 大小写不敏感，参数中的浏览器名或内核名大小写均可
-- 遵循define.amd标准，注册为其匿名模块
-- 没有define.amd时优先注册为$.browser或者window.browser
+- 遵循define.amd\define.cmd标准，使用CommonJS或seajs时，自动注册为其匿名模块
+- 没有define时优先注册为$.browser或者window.browser
 - 能获取版本号的浏览器或内核的版本号时，优先返回版本号，无版本号返回bool值
 - 除获取Gecko或Presto版本号以外，不需依赖userAgent，用户自定义useragent不影响浏览器判断和除Gecko或Presto外的版本号获取
