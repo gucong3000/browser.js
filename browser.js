@@ -121,7 +121,7 @@
 			}
 
 			if ( win.opera && typeof opera.version == "function") {
-				//老版本Opera(<=12)，>=15以后采用Chrome内核
+				//老版本Opera(<=12)，>=13以后采用Chrome内核
 				defineGetter("opera", opera.version);
 				defineGetter("Presto");
 				//修复浏览器差异，navigator.language从“zh-cn”形式改为“zh-CN”形式
@@ -162,7 +162,7 @@
 					//淘宝浏览器
 					defineGetter("TaoBrowser");
 				} else if (/\bOPR\b/.test(ua)) {
-					//Opera浏览器(15.0及以上)
+					//Opera浏览器(13.0及以上)
 					defineGetter("opera", "OPR");
 				}
 				//QQ浏览器,360急速,360安全3款浏览器无探测方法
