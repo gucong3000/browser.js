@@ -1,4 +1,4 @@
-browser.js v0.2
+browser.js v0.4
 ==========
 
 最靠谱的浏览器嗅探方式

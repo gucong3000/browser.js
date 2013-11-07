@@ -1,4 +1,4 @@
-/* browser.js v0.3
+/* browser.js v0.4
  * https://github.com/gucong3000/browser.js
  */
 /*
@@ -113,11 +113,19 @@
 			
 			//为result添加getter
 			function defineGetter(name, fn, split){
-				result.__defineGetter__(name.toLowerCase(), typeof fn === "function" ? function(){
-					return fn() || getver(name, split) || true;
-				} : function(){
-					return getver(fn || name, split) || true;
-				});
+				var prop = name.toLowerCase(),
+					getter = typeof fn === "function" ? function(){
+							return fn() || getver(name, split) || true;
+						} : function(){
+							return getver(fn || name, split) || true;
+						};
+				try {
+					Object.defineProperty(result, prop, {
+						get: getter
+					});
+				} catch(e) {
+					result.__defineGetter__(prop, getter);
+				}
 			}
 
 			if ( win.opera && typeof opera.version == "function") {
