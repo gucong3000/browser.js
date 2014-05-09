@@ -33,9 +33,9 @@
 	tester("Coolnovo", "枫树浏览器高速模式");
 	console.log(browser());
  */
-"use strict";
+
 (function (root, factory) {
-	if (typeof define === 'function' && ( define.amd || define.cmd )) {
+	if (typeof define === "function" && ( define.amd || define.cmd )) {
 		// AMD. CMD. Register as an anonymous module.
 		define(factory);
 	} else {
@@ -43,144 +43,107 @@
 		(root.$ || root).browser = factory();
 	}
 }(this, function () {
-	var jscript /*@cc_on = @_jscript_version @*/,
-		win = window,
+
+	"use strict";
+	var	win = window,
 		nav = win.navigator,
 		doc = win.document,
+		regWebkit = /\w*(WebKit)\b/,
 		documentMode = doc.documentMode,
+		compatMode = doc.compatMode,
+		appVersion = nav.appVersion,
+		userAgent = nav.userAgent,
 		lang = "language",
 		result = {},
-		expression;
-
-
-	if( documentMode > 10 || jscript) {
-		//IE11不支持条件编译，所以采用documentMode > 10来判断
-		(function(){
-			expression = function(exp){
-				return exp.replace(/\b(?!(true|false))[\w\.]+\b/ig, function(name){
-					return result[name.toLowerCase()] || "undefined";
-				});
-			};
-
-			//IE版本，msie为文档模式，version为浏览器版本
-			var compatMode = doc.compatMode;
-
-			result.version = documentMode ? (jscript > 8 ? jscript : ( jscript ? 8 : documentMode)) : (compatMode ? "XMLHttpRequest" in win ? 7 : 6 : 5);
-			result.msie = documentMode || (compatMode === "CSS1Compat" ? result.version : 5);
-
+		rv,
+		jscript = (function(sth){
+			/*@cc_on return @_jscript_version @*/
+			return sth;
 		})();
-	} else {
-		(function(){
-			var ext = win.external || {},
-				ua = nav.userAgent;
 
-			expression = function(exp){
-				return exp.replace(/\b(?!(true|false))[a-z]+\b/ig, function(name){
-					return result[name.toLowerCase()];
-				}).replace(/\b([\d\.]+)\s*([>=<]+)\s*([\d\.]+)\b/ig,function(exp){
-					return compare(RegExp.$1, RegExp.$3) + RegExp.$2 + "0";
-				}).replace(/\d+(\.\d+)+/g, function(ver){
-					return '"' + ver + '"';
-				});
-			};
-
-			//比较两个版本号，v1>v2则返回值大于零 v1<v2则返回值大于0，若v1==v2则返回值等于0
-			function compare(v1, v2) {
-				v1 = convert(v1);
-				v2 = convert(v2);
-				for (var diff = 0, i = 0; (i < v1.length || i < v2.length) && diff === 0; i++) {
-					diff = parseNum(v1[i]) - parseNum(v2[i]);
-				}
-				return diff;
-			}
-		
-			//将版本号按小数点分割为数组
-			function convert(ver){
-				return ver.toString().split(".");
-			}
-		
-			//将字符串转为数字
-			function parseNum(num){
-				return parseInt(num) || 0;
-			}
-			
-			//在字符串中查找版本号信息
-			function getver(name, split) {
-				if(new RegExp("\\b" + name + (split || "/") + "([\\d.]+)\\b").test(ua)){
-					return RegExp.$1;
-				}
-			}
-			
-			//为result添加getter
-			function defineGetter(name, fn, split){
-				var prop = name.toLowerCase(),
-					getter = typeof fn === "function" ? function(){
-							return fn() || getver(name, split) || true;
-						} : function(){
-							return getver(fn || name, split) || true;
-						};
-				try {
-					Object.defineProperty(result, prop, {
-						get: getter
-					});
-				} catch(e) {
-					result.__defineGetter__(prop, getter);
-				}
-			}
-
-			if ( win.opera && typeof opera.version == "function") {
-				//老版本Opera(<=12)，>=13以后采用Chrome内核
-				defineGetter("opera", opera.version);
-				defineGetter("Presto");
-				//修复浏览器差异，navigator.language从“zh-cn”形式改为“zh-CN”形式
-				nav.language = nav.language.replace(/\b-\w+$/,function(country){
-					return country.toUpperCase();
-				});
-			} else if ( win.netscape ) {
-				defineGetter("gecko", "rv", ":");
-			} else {
-				ua = nav.appVersion;
-				defineGetter("webkit", "\\w*WebKit");
-		
-				if( win.chrome ){
-					//判定为Chrome
-					defineGetter("Chrome");
-				} else if ( /^Apple/.test(nav.vendor) ){
-					//判定为Safari
-					defineGetter("safari", "Version");
-				}
-
-				if(ext.SEVersion) {
-					//搜狗浏览器
-					defineGetter("sogou", ext.SEVersion);
-				} else if ("max_version" in ext) {
-					//傲游
-					//Maxthon3使用max_version， Maxthon4使用appVersion
-					result.maxthon = ext.max_version || getver("Maxthon");
-				} else if (ext.LiebaoGetVersion) {
-					//猎豹
-					defineGetter("liebao", ext.LiebaoGetVersion);
-				} else if ("coolnovo" in ext) {
-					//枫树浏览器
-					defineGetter("CoolNovo");
-				} else if (/\bTheWorld\b/.test(ua)) {
-					//世界之窗
-					defineGetter("TheWorld");
-				} else if (/\bTaoBrowser\b/.test(ua)) {
-					//淘宝浏览器
-					defineGetter("TaoBrowser");
-				} else if (/\bOPR\b/.test(ua)) {
-					//Opera浏览器(13.0及以上)
-					defineGetter("opera", "OPR");
-				}
-				//QQ浏览器,360急速,360安全3款浏览器无探测方法
-			}
-		})();
+	//result对象赋值，有版本号信息时遵循版本号，没有时使用bool
+	function setrv(name, bool, val){
+		bool = !!bool;
+		if(bool){
+			bool = result[val] || result[name] || bool;
+			result[name] = bool;
+		} else {
+			delete result[name];
+		}
 	}
 
-	result[lang] = nav[lang] || nav.userLanguage;
+	//利用正则在字符串中获取其中一段
+	function regSubstr(str, reg){
+		return reg.test(str) ? RegExp.$1 : false;
+	}
 
-	return function(exp){
-		return exp ? ((exp = exp.toLowerCase()) in result ? result[exp] :( result[exp] = new Function("return " + expression(exp))())) : result;
-	};
+	//读取userAgent中各项信息放进result对象
+	function userAgent2result(reg){
+		if(jscript) {
+			//ie10及以下，只需括号中部分
+			userAgent = userAgent.replace(/^[^\(]+\(|\)$/,"");
+		} else if(!/\)$/.test(appVersion)){
+			//其他浏览器中，若appVersion不是以货号结尾，则使用appVersion代替userAgent
+			userAgent = appVersion;
+		}
+	
+		//如果userAgent未曾篡改
+		if(reg.test(userAgent)){
+			userAgent.replace(/(\w+)\/(\d[\w.]+)/g, function(str, name, val){
+				result[regSubstr(name, regWebkit) || name] = val;
+				
+			});
+		}
+	}
+
+	rv = regSubstr(userAgent, /rv:([\d\.]+)/);
+	
+	if(jscript){
+
+		/*
+		 *	IE浏览器版本获取思路
+		 *	IE9-11， js引擎版本号与浏览器版本号相同
+		 *	有document.documentMode，说明IE8以上
+		 *	有XMLHttpRequest，说明IE7以上
+		 *	有compatMode，说明IE6以上
+		 */
+
+		userAgent2result(/MSIE\s\d+/);
+
+		//IE版本，msie为文档模式，version为浏览器版本
+		result.rv = jscript > 8 ? jscript : compatMode ? "XMLHttpRequest" in win ? documentMode ? 8 : 7 : 6 : 5;
+
+		//result.msie直接采用document.documentMode，IE6\7浏览器按高版IE的documentMode规则计算
+		result.msie = documentMode || (compatMode === "CSS1Compat" ? result.rv : 5);
+		nav[lang] = nav.userLanguage;
+
+	} else if(documentMode){
+		result.msie = documentMode;
+		result.rv = rv || documentMode;
+	} else {
+
+		if(typeof netscape === "object"){
+			userAgent2result(/Gecko\/\d+/);
+			result.Gecko = rv || true;
+		} else if(typeof opera === "object"){
+			userAgent2result(/Opera/);
+			result.Opera = opera.version();
+			nav[lang] = nav[lang].replace(/\-\w+$/, function(str){
+				return str.toUpperCase();
+			});
+		} else {
+			userAgent2result(regWebkit);
+
+			setrv("WebKit", true);
+			setrv("Chrome", win.chrome);
+			setrv("Maxthon", /^Maxthon/.test(nav.vendor));
+			setrv("Safari", /^Apple/.test(nav.vendor), "Version");
+			setrv("Opera", /^Opera/.test(nav.vendor), "OPR");
+			
+		}
+	}
+
+	result[lang] = nav[lang];
+
+	return result;
 }));
