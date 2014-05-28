@@ -12,6 +12,9 @@ browser.Opera			//Opera下 返回Opera版本号
 browser.Gecko			//Firefox中返回Gecko版本号
 browser.Chrome			//基于Chromium二次开发的浏览器中返回Chrome版本号，其他返回false
 ```
+### 浏览器语言判断
+```bash
+browser.language		//返回浏览器语言，如“zh-CN”
 
 ### 浏览器外壳判断
 ```bash

@@ -60,7 +60,7 @@
 			//ie10及以下，只需括号中部分
 			userAgent = userAgent.replace(/^[^\(]+\(|\)$/,"");
 		} else if(!/\)$/.test(appVersion)){
-			//其他浏览器中，若appVersion不是以货号结尾，则使用appVersion代替userAgent
+			//其他浏览器中，若appVersion不是以括号结尾，则使用appVersion代替userAgent
 			userAgent = appVersion;
 		}
 	
