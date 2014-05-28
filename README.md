@@ -15,6 +15,7 @@ browser.Chrome			//基于Chromium二次开发的浏览器中返回Chrome版本�
 ### 浏览器语言判断
 ```bash
 browser.language		//返回浏览器语言，如“zh-CN”
+```
 
 ### 浏览器外壳判断
 ```bash
