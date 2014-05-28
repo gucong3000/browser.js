@@ -6,32 +6,9 @@
  * 无define但是有$时注册为其成员$.browser
  * 无define也无$时注册为全局变量
  * DEMO:
-	function tester(exp, name){
-		var info = browser(exp);
-		if(info){
-			document.writeln((name || exp) + "\t" + info + "<br>");
-		}
+	for(var i in browser){
+		document.writeln(i + ":\t" + browser[i] + "<br>");
 	}
-	
-	tester("msie", "IE 文档模式");
-	tester("version", "IE 版本号");
-	tester("Gecko");
-	if(browser("Opera && Chrome")){
-		tester("Opera", "新版 Opera (Chrome内核)");
-	} else if(browser("Opera && Presto")){
-		tester("Opera", "老版 Opera (Presto内核)");
-		tester("Presto");
-	}
-	tester("Webkit");
-	tester("Safari");
-	tester("Chrome");
-	tester("Sogou", "搜狗高速模式");
-	tester("Liebao", "猎豹高速模式");
-	tester("Maxthon", "遨游高速模式");
-	tester("TheWorld", "世界之窗高速模式");
-	tester("TaoBrowser", "淘宝浏览器极速模式");
-	tester("Coolnovo", "枫树浏览器高速模式");
-	console.log(browser());
  */
 
 (function (root, factory) {
@@ -91,7 +68,6 @@
 		if(reg.test(userAgent)){
 			userAgent.replace(/(\w+)\/(\d[\w.]+)/g, function(str, name, val){
 				result[regSubstr(name, regWebkit) || name] = val;
-				
 			});
 		}
 	}
