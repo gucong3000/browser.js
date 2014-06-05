@@ -2,7 +2,7 @@
   "name": "browser.js",
   "title": "browser.js",
   "description": "JavaScript library for browser info",
-  "version": "0.5",
+  "version": "0.5.0",
   "homepage": "https://github.com/gucong3000/browser.js",
   "author": {
     "name": "gucong",
