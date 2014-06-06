@@ -25,20 +25,20 @@ module.exports = function( grunt ) {
 		},
 
 		uglify: {
+			options: {
+				preserveComments: "some",
+				report: "min",
+				banner: "/*! <%= pkg.name %> v<%= pkg.version %>*/\n",
+				footer: "",
+				compress: {
+					hoist_funs: false,
+					loops: false,
+					unused: false
+				}
+			},
 			all: {
 				files: {
 					"browser.min.js": [ "browser.js" ]
-				},
-				options: {
-					preserveComments: "some",
-					report: "min",
-					banner: "/*! <%= pkg.name %> v<%= pkg.version %>*/\n",
-					footer: "",
-					compress: {
-						hoist_funs: false,
-						loops: false,
-						unused: false
-					}
 				}
 			}
 		}
