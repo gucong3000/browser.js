@@ -33,9 +33,9 @@
 		lang = "language",
 		result = {},
 		rv,
-		jscript = (function(sth){
+		jscript = (function(udf){
 			/*@cc_on return @_jscript_version @*/
-			return sth;
+			return udf;
 		})();
 
 	//result对象赋值，有版本号信息时遵循版本号，没有时使用bool
