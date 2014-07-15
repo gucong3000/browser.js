@@ -11,15 +11,15 @@
 	}
  */
 
-(function (root, factory) {
-	if (typeof define === "function" && ( define.amd || define.cmd )) {
+(function(root, factory) {
+	if (typeof define === "function" && (define.amd || define.cmd)) {
 		// AMD. CMD. Register as an anonymous module.
 		define(factory);
 	} else {
 		// Browser globals
 		(root.$ || root).browser = factory();
 	}
-}(this, function () {
+}(this, function() {
 
 	"use strict";
 	var	win = window,
@@ -39,9 +39,9 @@
 		})();
 
 	//result对象赋值，有版本号信息时遵循版本号，没有时使用bool
-	function setrv(name, bool, val){
+	function setrv(name, bool, val) {
 		bool = !!bool;
-		if(bool){
+		if (bool) {
 			bool = result[val] || result[name] || bool;
 			result[name] = bool;
 		} else {
@@ -50,31 +50,31 @@
 	}
 
 	//利用正则在字符串中获取其中一段
-	function regSubstr(str, reg){
+	function regSubstr(str, reg) {
 		return reg.test(str) ? RegExp.$1 : false;
 	}
 
 	//读取userAgent中各项信息放进result对象
-	function userAgent2result(reg){
-		if(jscript) {
+	function userAgent2result(reg) {
+		if (jscript) {
 			//ie10及以下，只需括号中部分
-			userAgent = userAgent.replace(/^[^\(]+\(|\)$/,"");
-		} else if(!/\)$/.test(appVersion)){
+			userAgent = userAgent.replace(/^[^\(]+\(|\)$/, "");
+		} else if (!/\)$/.test(appVersion)) {
 			//其他浏览器中，若appVersion不是以括号结尾，则使用appVersion代替userAgent
 			userAgent = appVersion;
 		}
-	
+
 		//如果userAgent未曾篡改
-		if(reg.test(userAgent)){
-			userAgent.replace(/(\w+)\/(\d[\w.]+)/g, function(str, name, val){
+		if (reg.test(userAgent)) {
+			userAgent.replace(/(\w+)\/(\d[\w.]+)/g, function(str, name, val) {
 				result[regSubstr(name, regWebkit) || name] = val;
 			});
 		}
 	}
 
 	rv = regSubstr(userAgent, /rv:([\d\.]+)/);
-	
-	if(jscript){
+
+	if (jscript) {
 
 		/*
 		 *	IE浏览器版本获取思路
@@ -93,18 +93,18 @@
 		result.msie = documentMode || (compatMode === "CSS1Compat" ? result.rv : 5);
 		nav[lang] = nav.userLanguage;
 
-	} else if(documentMode){
+	} else if (documentMode) {
 		result.msie = documentMode;
 		result.rv = rv || documentMode;
 	} else {
 
-		if(typeof netscape === "object"){
+		if (typeof netscape === "object") {
 			userAgent2result(/Gecko\/\d+/);
 			result.Gecko = rv || true;
-		} else if(typeof opera === "object"){
+		} else if (typeof opera === "object") {
 			userAgent2result(/Opera/);
 			result.Opera = opera.version();
-			nav[lang] = nav[lang].replace(/\-\w+$/, function(str){
+			nav[lang] = nav[lang].replace(/\-\w+$/, function(str) {
 				return str.toUpperCase();
 			});
 		} else {
@@ -115,7 +115,7 @@
 			setrv("Maxthon", /^Maxthon/.test(nav.vendor));
 			setrv("Safari", /^Apple/.test(nav.vendor), "Version");
 			setrv("Opera", /^Opera/.test(nav.vendor), "OPR");
-			
+
 		}
 	}
 
