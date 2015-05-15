@@ -122,7 +122,7 @@
 	}
 	// result.Mozilla -= 0;
 	result[lang] = nav[lang];
-	result.Mozilla = +(result.Mozilla || regSubstr(appVersion, /^(\d+(\.+\d+)*)/));
+	result.Mozilla = +(result.Mozilla || regSubstr(appVersion, /^(\d+(\.\d+)*)/));
 
 	return result;
 }));
