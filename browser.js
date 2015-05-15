@@ -37,7 +37,7 @@
 			// IE5-9中可获取jscript版本号老推算IE真实版本
 			/*@cc_on return @_jscript_version @*/
 			if (documentMode > 10) {
-				// IE11+ 中，使用从appVersion中获取的Trident版本号推算IE真实版本号，微软最新版本浏览器 MS EDGE 效果待测试
+				// IE11+ 中，使用从navigator.appVersion中获取的Trident版本号推算IE真实版本号，微软最新版本浏览器 MS EDGE 效果待测试
 				return +regSubstr(appVersion, /\bTrident\/(\d+)/) + 4;
 			}
 		})();
