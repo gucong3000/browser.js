@@ -33,9 +33,13 @@
 		lang = "language",
 		result = {},
 		rv,
-		jscript = (function(udf){
+		jscript = (function() {
+			// IE5-9中可获取jscript版本号老推算IE真实版本
 			/*@cc_on return @_jscript_version @*/
-			return udf;
+			if (documentMode > 10) {
+				// IE11+ 中，使用从appVersion中获取的Trident版本号推算IE真实版本号，微软最新版本浏览器 MS EDGE 效果待测试
+				return +regSubstr(appVersion, /\bTrident\/(\d+)/) + 4;
+			}
 		})();
 
 	//result对象赋值，有版本号信息时遵循版本号，没有时使用bool
@@ -70,9 +74,8 @@
 				result[regSubstr(name, regWebkit) || name] = val;
 			});
 		}
+		rv = regSubstr(userAgent, /rv:([\d\.]+)/);
 	}
-
-	rv = regSubstr(userAgent, /rv:([\d\.]+)/);
 
 	if (jscript) {
 
@@ -84,25 +87,24 @@
 		 *	有compatMode，说明IE6以上
 		 */
 
-		userAgent2result(/MSIE\s\d+/);
+		userAgent2result(/\b(MSIE\s|Trident\/)\d+/);
 
 		//IE版本，msie为文档模式，version为浏览器版本
 		result.rv = jscript > 8 ? jscript : compatMode ? "XMLHttpRequest" in win ? documentMode ? 8 : 7 : 6 : 5;
 
 		//result.msie直接采用document.documentMode，IE6\7浏览器按高版IE的documentMode规则计算
 		result.msie = documentMode || (compatMode === "CSS1Compat" ? result.rv : 5);
-		nav[lang] = nav.userLanguage;
+		if (!nav[lang]) {
+			nav[lang] = nav.userLanguage;
+		}
 
-	} else if (documentMode) {
-		result.msie = documentMode;
-		result.rv = rv || documentMode;
 	} else {
 
 		if (typeof netscape === "object") {
-			userAgent2result(/Gecko\/\d+/);
+			userAgent2result(/\bGecko\/\d+/);
 			result.Gecko = rv || true;
 		} else if (typeof opera === "object") {
-			userAgent2result(/Opera/);
+			userAgent2result(/\bOpera\b/);
 			result.Opera = opera.version();
 			nav[lang] = nav[lang].replace(/\-\w+$/, function(str) {
 				return str.toUpperCase();
@@ -118,8 +120,9 @@
 
 		}
 	}
-
+	// result.Mozilla -= 0;
 	result[lang] = nav[lang];
+	result.Mozilla = +(result.Mozilla || regSubstr(appVersion, /^(\d+(\.+\d+)*)/));
 
 	return result;
 }));
