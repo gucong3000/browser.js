@@ -22,7 +22,7 @@
 }(this, function() {
 
 	"use strict";
-	var	win = window,
+	var win = window,
 		nav = win.navigator,
 		doc = win.document,
 		regWebkit = /\w*(WebKit)\b/,
@@ -37,7 +37,7 @@
 			// IE5-9中可获取jscript版本号老推算IE真实版本
 			/*@cc_on return @_jscript_version @*/
 			if (documentMode > 10) {
-				// IE11+ 中，使用从navigator.appVersion中获取的Trident版本号推算IE真实版本号，微软最新版本浏览器 MS EDGE 效果待测试
+				// IE11+ 中，使用从navigator.appVersion中获取的Trident版本号推算IE真实版本号，微软最新版本浏览器 MS EDGE 算作Chrome内核较为妥当
 				return +regSubstr(appVersion, /\bTrident\/(\d+)/) + 4;
 			}
 		})();
@@ -46,7 +46,7 @@
 	function setrv(name, bool, val) {
 		bool = !!bool;
 		if (bool) {
-			bool = result[val] || result[name] || bool;
+			bool = result[val || name] || result[name] || bool;
 			result[name] = bool;
 		} else {
 			delete result[name];
@@ -117,10 +117,13 @@
 			setrv("Maxthon", /^Maxthon/.test(nav.vendor));
 			setrv("Safari", /^Apple/.test(nav.vendor), "Version");
 			setrv("Opera", /^Opera/.test(nav.vendor), "OPR");
+			if (result.Edge && !("userLanguage" in nav && "browserLanguage" in nav && "systemLanguage" in nav)) {
+				delete result.Edge;
+			}
 
 		}
 	}
-	// result.Mozilla -= 0;
+
 	result[lang] = nav[lang];
 	result.Mozilla = +(result.Mozilla || regSubstr(appVersion, /^(\d+(\.\d+)*)/));
 
