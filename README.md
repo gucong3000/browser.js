@@ -28,6 +28,6 @@ browser.CoolNovo		//枫树浏览器高速模式返回版本号
 
 ### 特性：
 - 支持IE5-IE11、Webkit、Gecko、Presto内核浏览器
-- 遵循define.amd\define.cmd标准，使用CommonJS或seajs时，自动注册为其匿名模块
+- 遵循define.amd\define.cmd标准，使用RequireJS或seajs时，自动注册为其匿名模块
 - 没有define函数时，优先注册为$.browser或者window.browser
 - 能获取版本号的浏览器或内核的版本号时，优先返回版本号，无版本号返回bool值
