@@ -125,7 +125,6 @@
 	}
 
 	result[lang] = nav[lang];
-	result.Mozilla = +(result.Mozilla || regSubstr(appVersion, /^(\d+(\.\d+)*)/));
 
 	return result;
 }));
