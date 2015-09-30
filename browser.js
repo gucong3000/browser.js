@@ -26,6 +26,10 @@
 		nav = win.navigator,
 		doc = win.document,
 		regWebkit = /\w*(WebKit)\b/,
+		/**
+		 * documentMode is an IE-only property
+		 * https://msdn.microsoft.com/library/cc196988%28v=vs.85%29.aspx
+		 */
 		documentMode = doc.documentMode,
 		compatMode = doc.compatMode,
 		appVersion = nav.appVersion,
