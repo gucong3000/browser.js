@@ -52,6 +52,7 @@
 		if (bool) {
 			bool = result[val || name] || result[name] || bool;
 			result[name] = bool;
+			return bool;
 		} else {
 			delete result[name];
 		}
@@ -115,16 +116,19 @@
 			});
 		} else {
 			userAgent2result(regWebkit);
-
-			setrv("WebKit", true);
-			setrv("Chrome", win.chrome);
-			setrv("Maxthon", /^Maxthon/.test(nav.vendor));
-			setrv("Safari", /^Apple/.test(nav.vendor), "Version");
-			setrv("Opera", /^Opera/.test(nav.vendor), "OPR");
-			if (result.Edge && !("userLanguage" in nav && "browserLanguage" in nav && "systemLanguage" in nav)) {
-				delete result.Edge;
+			if (setrv("Chrome", win.chrome || /^Google\b/.test(nav.vendor))) {
+				if (setrv("Edge", "msManipulationViewsEnabled" in nav)) {
+					result = {
+						Edge: result.Edge
+					};
+				} else {
+					setrv("Opera", /^Opera/.test(nav.vendor), "OPR");
+					delete result.Safari;
+					// 其他基于Chrome二次开发的浏览器的判断
+				}
+			} else {
+				setrv("Safari", /^Apple\b/.test(nav.vendor), "Version") || setrv("Maxthon", /^Maxthon/.test(nav.vendor));
 			}
-
 		}
 	}
 
