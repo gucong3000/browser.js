@@ -1,11 +1,11 @@
-module.exports = function( grunt ) {
+module.exports = function(grunt) {
 	"use strict";
 
-	function readOptionalJSON( filepath ) {
+	function readOptionalJSON(filepath) {
 		var data = {};
 		try {
-			data = grunt.file.readJSON( filepath );
-		} catch ( e ) {}
+			data = grunt.file.readJSON(filepath);
+		} catch (e) {}
 		return data;
 	}
 
@@ -13,7 +13,7 @@ module.exports = function( grunt ) {
 	// But our modules can
 
 	grunt.initConfig({
-		pkg: grunt.file.readJSON( "package.json" ),
+		pkg: grunt.file.readJSON("package.json"),
 
 		jshint: {
 			all: {
@@ -27,8 +27,8 @@ module.exports = function( grunt ) {
 		uglify: {
 			options: {
 				banner: "/* <%= pkg.name %> v<%= pkg.version %>\n * homepage: <%= pkg.homepage %>\n */\n",
-				preserveComments: function(o, info){
-					return /@(cc_on|if|else|end|_jscript(_\w+)?)\s/i.test(info.value);
+				preserveComments: function(o, info) {
+					return /@(cc_on|if|else|end|_jscript(?:_\w+)?)\s/i.test(info.value);
 				},
 				report: "min",
 				footer: "",
@@ -40,7 +40,7 @@ module.exports = function( grunt ) {
 			},
 			all: {
 				files: {
-					"browser.min.js": [ "browser.js" ]
+					"browser.min.js": ["browser.js"]
 				}
 			}
 		}
@@ -51,5 +51,5 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks("grunt-contrib-uglify");
 
 	// Default grunt
-	grunt.registerTask( "default", [ "jshint", "uglify" ] );
+	grunt.registerTask("default", ["jshint", "uglify"]);
 };

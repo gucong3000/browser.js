@@ -11,13 +11,12 @@
 <script src="browser.min.js"></script>
 <script>
 document.writeln(navigator.userAgent + "<br>");
-
-for(var i in browser){
-	document.writeln(i + ":\t" + browser[i] + "<br>");
-}
-
-if(window.console){
-	console.log(browser);
+if(window.JSON){
+	document.writeln("<pre>" + JSON.stringify(browser, 0, 4));
+} else {
+	for(var i in browser){
+		document.writeln(i + ":\t" + browser[i] + "<br>");
+	}
 }
 </script>
 </body>
