@@ -30,6 +30,8 @@ browser.Windows			// Windows版本号
 ```
 
 ### 特性：
+
+- 修正各浏览器的DOM属性名称私有属性前缀
 - 支持IE5-IE11、Webkit、Gecko、Presto内核浏览器
 - 遵循define.amd\define.cmd标准，使用RequireJS或seajs时，自动注册为其匿名模块
 - 没有define函数时，优先注册为$.browser或者window.browser

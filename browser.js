@@ -95,7 +95,7 @@
 
 		// Gecko内核浏览器和Webkit内核浏览器
 		var keyMap = {
-				Gecko: "rv",
+				Gecko: "rv:",
 				Version: 0,
 				rv: 0,
 				Webkit: "\\w+WebKit\\/"
@@ -167,7 +167,86 @@
 		});
 	}
 
-	// 计算屏幕对角线长度， 小于12英寸的都算移动端
-	result.Mobile = result.Mobile || (Math.sqrt(Math.pow(screen.width, 2) + Math.pow(screen.height, 2)) / 96 / (win.devicePixelRatio || 1) < 12);
+	/**************************************
+	 * Properties
+	 **************************************/
+	var reSubPrapName = /([a-z]+[A-Z][a-z]+)[A-Z][a-z]*$/,
+		propNameMap = {
+			matchesSelector: "matches"
+		},
+		Object = win.Object,
+		currStyle,
+		propName;
+
+	// 修复各种对象中，名称以私有前缀开头的成员
+	function fixPorpName(obj, oldPropName, testObj) {
+		var newPropName = oldPropName.replace(/^(?:[a-z]+|Ms|O)([A-Z])(\w)/, function(s, letter1, letter2) {
+			if (/[a-z]/.test(letter2)) {
+				letter1 = letter1.toLowerCase();
+			}
+			return letter1 + letter2;
+		});
+		newPropName = propNameMap[newPropName] || newPropName;
+		if (!(newPropName in (testObj || obj))) {
+			Object.defineProperty(obj, newPropName, {
+				get: function() {
+					return this[oldPropName];
+				},
+				set: function(val) {
+					this[oldPropName] = val;
+				},
+				enumerable: true
+			});
+			console.log(newPropName + "\t" + oldPropName, obj);
+			return obj;
+		}
+	}
+
+	function hasPreFix(propName) {
+		return (opera ? /^(?:o[A-Z]|O[A-Z][a-z])/ : /^(?:webkit|khtml|moz|ms|Ms)[A-Z]/).test(propName);
+	}
+
+	function fixStyle(propName) {
+		if (fixPorpName(win.CSSStyleDeclaration.prototype, propName, currStyle) && reSubPrapName.test(propName)) {
+			fixStyle(propName.replace(reSubPrapName, "$1"));
+		}
+	}
+
+	function styleForEach(propName) {
+		if (/^-[a-z]+-\w/.test(propName)) {
+			propName = propName.replace(/-([a-z])/g, function($0, $1) {
+				return $1.toUpperCase();
+			});
+		} else if (!hasPreFix(propName)) {
+			return;
+		}
+		fixStyle(propName);
+	}
+
+	if (Object.getPrototypeOf) {
+		Object.getOwnPropertyNames(win).forEach(function(obj) {
+			if (hasPreFix(obj)) {
+				fixPorpName(win, obj);
+			} else if (/^[A-Z]/.test(obj)) {
+				obj = win[obj].prototype;
+
+				for (var propName in obj) {
+					if (hasPreFix(propName)) {
+						fixPorpName(obj, propName);
+					}
+				}
+			}
+		});
+
+		currStyle = win.getComputedStyle(doc.createElement("div"), null);
+		// Some browsers have numerical indices for the properties, some don't
+		if (currStyle.length > 0) {
+			[].slice.call(currStyle, 0).forEach(styleForEach);
+		} else {
+			for (propName in currStyle) {
+				styleForEach(propName);
+			}
+		}
+	}
 	return result;
 }));
