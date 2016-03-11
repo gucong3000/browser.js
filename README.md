@@ -1,11 +1,11 @@
-browser.js v0.6
+browser.js v0.7.1
 ==========
 
 最靠谱的浏览器嗅探方式
 --------------------------------------
 ### 浏览器内核判断
 ```Javescript
-browser.Chrome			// 基于Chromium二次开发的浏览器中返回Chrome版本号
+browser.Chrome			// Chrome和基于Chromium二次开发的浏览器中返回Chrome版本号
 browser.Edge			// 微软Win10中的Edge浏览器下返回版本号
 browser.Gecko			// Firefox中返回Gecko版本号
 browser.MSIE			// IE下返回IE的文档模式，怪癖模式返回5
@@ -19,9 +19,11 @@ browser.WebKit			// Chrome或Safari等webkit内核浏览器下返回webkit版本
 browser.languages		// 返回浏览器语言，如`["zh-CN", "zh"]`
 ```
 
-### 操作系统判断
+### 平台判断
 ```Javescript
 browser.Android			// Android卓版本号
+browser.Macintosh		// OS X 版本号
+browser.CPU				// OS X 下返回CPU类型
 browser.IOS				// IOS版本号
 browser.iPad			// 是否运行于iPad
 browser.iPhone			// 是否运行于iPhone

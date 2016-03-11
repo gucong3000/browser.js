@@ -40,8 +40,10 @@
 		result = {},
 		rv,
 		jscript = (function() {
-			// IE5-10中可获取jscript版本号来推算IE真实版本
+			// 微软的JScript语言独有的条件注释语句,！！！勿删！！！返回js引擎的版本号
 			/*@cc_on return @_jscript_version;@*/
+
+			// IE11不再使用JScript语言，改用document.documentMode
 			if (documentMode > 10 && isMs()) {
 				// IE11
 				return documentMode;
@@ -95,6 +97,7 @@
 
 		// Gecko内核浏览器和Webkit内核浏览器
 		var keyMap = {
+				Safari: "Version\\/",
 				Gecko: "rv:",
 				Version: 0,
 				rv: 0,
@@ -102,6 +105,7 @@
 			},
 			isChrome = win.chrome || /^Google\b/.test(nav.vendor),
 			isEdge = isMs(),
+			// Safari 和后来其他基于AppleWebKit引擎开发的浏览器中`navigator.productSub`总是等于`20030107`，参见: http://stackoverflow.com/questions/13880858/why-does-navigator-productsub-always-equals-20030107-on-chrome-and-safari
 			isWebkit = nav.productSub === "20030107" && !isEdge;
 
 		var is = {
@@ -121,12 +125,19 @@
 
 		// 查查userAgent中还有哪些没有列举的版本号，除了黑名单中的之外，放result中
 		userAgent.replace(/(\w+)\/(\d+[\w.]+)/g, function(str, name, val) {
-			if (!/^\w+WebKit$/.test(name) && !(name in keyMap)) {
-				if (!(name in is)) {
-					result[name] = val;
-				}
+			if (!/^\w+WebKit$/.test(name) && !(name in keyMap) && !(name in is)) {
+				result[name] = val;
 			}
 		});
+	}
+
+	/**
+	 * 将Mac、IOS风格的版本号转换为传统风格
+	 * @param  {String} str 以下划线分隔的版本还字符串
+	 * @return {String||Boolean}     以小数点分隔的版本还字符串，若失败返回true
+	 */
+	function parseVerStr(str) {
+		return str ? str.replace(/_/g, ".") : true;
 	}
 
 	try {
@@ -138,17 +149,24 @@
 
 	}
 
+	/**
+	 * 获取`navigator.languages`中的最后一项
+	 * @return {[type]} [description]
+	 */
 	function getLastLang() {
 		return nav[langs][nav[langs].length - 1];
 	}
 
+	// 浏览器语言，若不支持`navigator.languages`
 	if (!nav[langs]) {
 		nav[langs] = [nav[lang]];
-		// 浏览器语言，若不支持`navigator.language`则使用去国家后缀的办法脑补
+		// 使用语言代码去掉国家后缀的办法脑补其他语言设置
 		while (regAreaCode.test(getLastLang())) {
 			nav[langs].push(getLastLang().replace(regAreaCode, ""));
 		}
 	}
+
+	// ["zh-CN", "zh"]
 	result[langs] = nav[langs];
 
 	userAgent = userAgent.replace(/^.*?\((.*?)\).*$/, "$1").
@@ -156,14 +174,24 @@
 		// 获取Windows版本
 		result.Windows = ver;
 	});
-	if (!result.MSIE) {
+	if (!result.Windows) {
 		userAgent.replace(/;\s*(\w+)\s(\d+[\w.]+)/g, function(str, key, value) {
 			// 获取一般的系统版本信息，如Android
 			result[key] = value;
-		}).replace(/\b(iP\w+);.*?(\d+\w+)/g, function(str, device, ver) {
-			// 获取IOS的版本信息
-			result[device] = true;
-			result.IOS = ver.replace(/_/g, ".");
+		}).replace(/\b(\w+);(?: \w+;)* (CPU|PPC|Intel)(?:(?:(?: iPhone)? OS (\d+\w+))? like)?(?: Mac OS(?: X)?(?: (\d+\w+))?)?\b/g, function(str, device, cpu, iosVer, macVer) {
+
+			if ((macVer && !iosVer) || device === "Macintosh") {
+				if (cpu !== "CPU") {
+					result.CPU = cpu;
+				}
+				// 输出OS X版本号
+				result[device] = parseVerStr(macVer);
+			} else {
+				// 输出设备名称，如iPad、iPhone、iPod
+				result[device] = true;
+				// 输出IOS的版本信息
+				result.IOS = parseVerStr(iosVer);
+			}
 		});
 	}
 
@@ -178,7 +206,13 @@
 		currStyle,
 		propName;
 
-	// 修复各种对象中，名称以私有前缀开头的成员
+	/**
+	 * 修复对象成员的名称为无私有前缀的
+	 * @param  {Object} obj         要修的对象
+	 * @param  {String} oldPropName 要修的成员名称
+	 * @param  {Object} testObj     测试是否需要修所用的对象，留空则使用obj测试
+	 * @return {Object}             若进行了修复，返回修复后的对象
+	 */
 	function fixPorpName(obj, oldPropName, testObj) {
 		var newPropName = oldPropName.replace(/^(?:[a-z]+|Ms|O)([A-Z])(\w)/, function(s, letter1, letter2) {
 			if (/[a-z]/.test(letter2)) {
@@ -197,37 +231,61 @@
 				},
 				enumerable: true
 			});
-			console.log(newPropName + "\t" + oldPropName, obj);
 			return obj;
 		}
 	}
 
+	/**
+	 * 判断对象的成员名是否有前缀
+	 * @param  {String}  propName 对象的成员名
+	 * @return {Boolean}          手否有前缀
+	 */
 	function hasPreFix(propName) {
 		return (opera ? /^(?:o[A-Z]|O[A-Z][a-z])/ : /^(?:webkit|khtml|moz|ms|Ms)[A-Z]/).test(propName);
 	}
 
-	function fixStyle(propName) {
+	/**
+	 * 修复CSSStyleDeclaration.prototype的成员的名称为无私有前缀的
+	 * @param  {String}  propName DOM风格的CSS属性名
+	 */
+	function fixCssProp(propName) {
+		// 如果该css属性修复成功，且他有父级属性，如fontSize的父级属性为font
 		if (fixPorpName(win.CSSStyleDeclaration.prototype, propName, currStyle) && reSubPrapName.test(propName)) {
-			fixStyle(propName.replace(reSubPrapName, "$1"));
+			// 修复父级属性
+			fixCssProp(propName.replace(reSubPrapName, "$1"));
 		}
 	}
 
-	function styleForEach(propName) {
+	/**
+	 * 检查CSS属性名是否需要修复，需要则修复，不需要则啥都不做
+	 * @param  {String} propName css属性名
+	 */
+	function checkCssProp(propName) {
+		// -webkit-prop式的属性名
 		if (/^-[a-z]+-\w/.test(propName)) {
+			// 属性名转为Dom风格的
 			propName = propName.replace(/-([a-z])/g, function($0, $1) {
 				return $1.toUpperCase();
 			});
 		} else if (!hasPreFix(propName)) {
+			// 属性名无前缀，无需修复
 			return;
 		}
-		fixStyle(propName);
+		// 修复该属性名
+		fixCssProp(propName);
 	}
 
 	if (Object.getPrototypeOf) {
+
+		// 遍历window对象下面的所有成员
 		Object.getOwnPropertyNames(win).forEach(function(obj) {
 			if (hasPreFix(obj)) {
+				// win[obj]成员的名称有前缀，修复
 				fixPorpName(win, obj);
-			} else if (/^[A-Z]/.test(obj)) {
+
+			} else if (win[obj] && /^[A-Z]/.test(obj)) {
+				// win[obj]是个DOM对象原型，修复其prototype
+				// issues #1 'undefined' is not an object (evaluating 'win[obj].prototype')
 				obj = win[obj].prototype;
 
 				for (var propName in obj) {
@@ -241,10 +299,10 @@
 		currStyle = win.getComputedStyle(doc.createElement("div"), null);
 		// Some browsers have numerical indices for the properties, some don't
 		if (currStyle.length > 0) {
-			[].slice.call(currStyle, 0).forEach(styleForEach);
+			[].slice.call(currStyle, 0).forEach(checkCssProp);
 		} else {
 			for (propName in currStyle) {
-				styleForEach(propName);
+				checkCssProp(propName);
 			}
 		}
 	}
