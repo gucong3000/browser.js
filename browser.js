@@ -12,12 +12,21 @@
  */
 
 (function(root, factory) {
-	if (typeof define === "function" && (define.amd || define.cmd)) {
-		// AMD. CMD. Register as an anonymous module.
+	/* global define, exports, module */
+	if (typeof define === "function" && define.amd) {
+		// AMD. Register as an anonymous module.
 		define(factory);
+	} else if (typeof exports === "object") {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like enviroments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	} else if (root.$) {
+		// Register as an jQuery plugin
+		root.$.browser = factory();
 	} else {
-		// Browser globals
-		(root.$ || root).browser = factory();
+		// Browser globals (root is window)
+		root.browser = factory();
 	}
 }(this, function() {
 
@@ -103,23 +112,31 @@
 				rv: 0,
 				Webkit: "\\w+WebKit\\/"
 			},
-			isChrome = win.chrome || /^Google\b/.test(nav.vendor),
-			isEdge = isMs(),
 			// Safari 和后来其他基于AppleWebKit引擎开发的浏览器中`navigator.productSub`总是等于`20030107`，参见: http://stackoverflow.com/questions/13880858/why-does-navigator-productsub-always-equals-20030107-on-chrome-and-safari
-			isWebkit = nav.productSub === "20030107" && !isEdge;
+			isWebkit = nav.productSub === "20030107",
+			isChrome = win.chrome || /^Google\b/.test(nav.vendor),
+			isGecko = win.netscape;
 
-		var is = {
-			Chrome: isChrome && isWebkit,
-			Edge: isEdge,
-			Gecko: win.netscape && !isEdge,
-			Safari: !isChrome && isWebkit,
+
+		// Edge浏览器在模仿webkit，所以最先排除掉
+		var is = isMs() ? {
+			// EDGE浏览器内核
+			Edge: 1
+		} : (isWebkit ? {
+			// webkit浏览器内核身世复杂，所以第二个排除
+			Chrome: isChrome,
+			Safari: !isChrome,
 			Webkit: isWebkit
-		};
+		} : {
+			// 其他浏览器内核，其中Khtml是瞎猜的
+			Khtml: !isGecko,
+			Gecko: isGecko
+		});
 
 		// is 中列举的了字段，一一去useragent中查找版本号
 		for (var key in is) {
 			if (is[key]) {
-				result[key] = new RegExp("\\b" + (keyMap[key] ? keyMap[key] : (key + "\\/")) + "(\\d+[\\w.]+)").test(userAgent) ? RegExp.$1 : is[key];
+				result[key] = new RegExp("\\b" + (keyMap[key] ? keyMap[key] : (key + "\\/")) + "(\\d+[\\w.]+)").test(userAgent) ? RegExp.$1 : !!is[key];
 			}
 		}
 
@@ -199,29 +216,54 @@
 	 * Properties
 	 **************************************/
 	var reSubPrapName = /([a-z]+[A-Z][a-z]+)[A-Z][a-z]*$/,
+
+		// 对于标准属性名称与私有属性名称有差异的，映射。
 		propNameMap = {
+			offlineAudioContext: "OfflineAudioContext",
+			audioContext: "AudioContext",
+			enterFullscreen: "requestFullscreen",
+			exitFullscreen: "cancelFullscreen",
 			matchesSelector: "matches"
 		},
 		Object = win.Object,
+		prefix = {},
 		currStyle,
 		propName;
 
 	/**
 	 * 修复对象成员的名称为无私有前缀的
 	 * @param  {Object} obj         要修的对象
-	 * @param  {String} oldPropName 要修的成员名称
+	 * @param  {String} oldPropName 要修的属性名称
 	 * @param  {Object} testObj     测试是否需要修所用的对象，留空则使用obj测试
 	 * @return {Object}             若进行了修复，返回修复后的对象
 	 */
 	function fixPorpName(obj, oldPropName, testObj) {
-		var newPropName = oldPropName.replace(/^(?:[a-z]+|Ms|O)([A-Z])(\w)/, function(s, letter1, letter2) {
+		// webkitURL 形式转为 URL，MozAppearance转为appearance，webkitAppearance转为appearance
+		var newPropName = oldPropName.replace(/^(?:[A-Z]?[a-z]+|Ms|O)([A-Z])(\w)/, function(s, letter1, letter2) {
 			if (/[a-z]/.test(letter2)) {
 				letter1 = letter1.toLowerCase();
 			}
 			return letter1 + letter2;
-		});
+		}).replace(/(F|f)ullScreen/, "$1ullscreen");
+		var objType;
+
+		testObj = testObj || obj;
 		newPropName = propNameMap[newPropName] || newPropName;
-		if (!(newPropName in (testObj || obj))) {
+
+		if (!(newPropName in testObj || testObj[newPropName] || (newPropName[0].toUpperCase() + newPropName.slice(1)) in testObj)) {
+			objType = obj.constructor.name;
+			if (!objType) {
+				try {
+					objType = String(obj).replace(/.*\[\w+\s+(\w+?)(?:Prototype)?\].*/, "$1");
+				} catch (ex) {
+					objType = "Window";
+				}
+			}
+
+			if (win[objType]) {
+				obj = win[objType].prototype || obj;
+			}
+			(prefix[objType] = prefix[objType] || {})[oldPropName] = newPropName;
 			Object.defineProperty(obj, newPropName, {
 				get: function() {
 					return this[oldPropName];
@@ -236,12 +278,13 @@
 	}
 
 	/**
-	 * 判断对象的成员名是否有前缀
-	 * @param  {String}  propName 对象的成员名
+	 * 判断对象的属性名是否有前缀
+	 * @param  {String}  propName 对象的属性名
 	 * @return {Boolean}          手否有前缀
 	 */
 	function hasPreFix(propName) {
-		return (opera ? /^(?:o[A-Z]|O[A-Z][a-z])/ : /^(?:webkit|khtml|moz|ms|Ms)[A-Z]/).test(propName);
+		// 最新版本的火狐和EDGE浏览器，开始使用webkit的私有属性前缀，所以这里不预先判断前缀名，而是运行时抓。
+		return (opera ? /^(?:o[A-Z]|O[A-Z][a-z])/ : /^(?:[Ww]ebkit|[Kk]html|[Mm]oz|[Mm]s)[A-Z]/).test(propName);
 	}
 
 	/**
@@ -263,7 +306,7 @@
 	function checkCssProp(propName) {
 		// -webkit-prop式的属性名
 		if (/^-[a-z]+-\w/.test(propName)) {
-			// 属性名转为Dom风格的
+			// 属性名转为Dom风格的camelCase命名风格
 			propName = propName.replace(/-([a-z])/g, function($0, $1) {
 				return $1.toUpperCase();
 			});
@@ -275,7 +318,38 @@
 		fixCssProp(propName);
 	}
 
+	/**
+	 * 检查对象私有属性是否其原型链上的对象所定义的。
+	 * @param  {Object} prototype 原型对象
+	 * @param  {String} propName  属性名
+	 * @return {[type]}           父类是否有此属性
+	 */
+	function checkParentPrototype(prototype, propName) {
+		var parentPrototype = Object.getPrototypeOf(prototype);
+		if (propName in parentPrototype) {
+			// propName属性在弗雷上发现
+			if (!checkParentPrototype(parentPrototype, propName)) {
+				// 父类的父类没有定义，才修复当前元素
+				fixPorpName(parentPrototype, propName);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	if (Object.getPrototypeOf) {
+
+		// 必须先修复CSS的私有属性前缀，否则CSSStyleDeclaration对象将被修复在其子类CSS2Properties上，这时貌似checkParentPrototype函数没有起到作用
+		currStyle = win.getComputedStyle(doc.createElement("div"), null);
+		// Some browsers have numerical indices for the properties, some don't
+		if (currStyle.length > 0) {
+			[].slice.call(currStyle, 0).forEach(checkCssProp);
+		} else {
+			for (propName in currStyle) {
+				checkCssProp(propName);
+			}
+		}
 
 		// 遍历window对象下面的所有成员
 		Object.getOwnPropertyNames(win).forEach(function(obj) {
@@ -290,21 +364,17 @@
 
 				for (var propName in obj) {
 					if (hasPreFix(propName)) {
-						fixPorpName(obj, propName);
+						// 发现属性名propName需要修复
+						if (!checkParentPrototype(obj, propName)) {
+							// 如果propName不是在其原型链上对的元素定义的，那修复当前对象
+							fixPorpName(obj, propName);
+						}
 					}
 				}
 			}
 		});
 
-		currStyle = win.getComputedStyle(doc.createElement("div"), null);
-		// Some browsers have numerical indices for the properties, some don't
-		if (currStyle.length > 0) {
-			[].slice.call(currStyle, 0).forEach(checkCssProp);
-		} else {
-			for (propName in currStyle) {
-				checkCssProp(propName);
-			}
-		}
+		result.prefix = prefix;
 	}
 	return result;
 }));

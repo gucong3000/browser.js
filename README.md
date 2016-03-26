@@ -1,4 +1,4 @@
-browser.js v0.7.1
+browser.js v0.8
 ==========
 
 最靠谱的浏览器嗅探方式
@@ -14,10 +14,6 @@ browser.Opera			// Opera下 返回Opera版本号
 browser.Safari			// Safari下返回Safari版本号(Maxthon算基于Safari开发的浏览器)
 browser.WebKit			// Chrome或Safari等webkit内核浏览器下返回webkit版本号
 ```
-### 浏览器语言判断
-```Javescript
-browser.languages		// 返回浏览器语言，如`["zh-CN", "zh"]`
-```
 
 ### 平台判断
 ```Javescript
@@ -31,10 +27,27 @@ browser.iPod			// 是否运行于iPod
 browser.Windows			// Windows版本号
 ```
 
+### 其他
+```Javescript
+browser.languages		// 返回浏览器语言，如`["zh-CN", "zh"]`
+browser.prefix			// 已修正的拥有私有属性的对象，及修正后的属性名
+```
+
 ### 特性：
 
-- 修正各浏览器的DOM属性名称私有属性前缀
-- 支持IE5-IE11、Webkit、Gecko、Presto内核浏览器
-- 遵循define.amd\define.cmd标准，使用RequireJS或seajs时，自动注册为其匿名模块
-- 没有define函数时，优先注册为$.browser或者window.browser
+- 利用DOM特征来判断浏览器，修改UserAgent不影响判断的准确性
 - 能获取版本号的浏览器或内核的版本号时，优先返回版本号，无版本号返回bool值
+- 修正各浏览器DOM的私有属性前缀
+- 遵循amd/umd标准模块规范，当不能注册为js模块时，会依次尝试注册为jQuery插件、全局变量
+
+### 用例
+
+```
+// 全屏播放视频，不用再写三种前缀，两种"S"大小写一大堆if判断
+vadio.requestFullscreen();
+
+if(browser.rv > browser.MSIE){
+	alert("您的IE没有处于标准文档模式");
+}
+	
+```
