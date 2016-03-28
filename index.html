@@ -87,7 +87,17 @@ if(browser.rv &gt; browser.MSIE){
       </footer>
 
     </section>
-
-  
+<script src="browser.js"></script>
+<!--[if lte IE 7]><script src="//dn-staticfile.qbox.me/json2/20121008/json2.min.js"></script><![endif]-->
+<script>
+document.writeln(navigator.userAgent + "<br>");
+if(window.JSON){
+  document.writeln("<pre>" + JSON.stringify(browser, 0, 4));
+} else {
+  for(var i in browser){
+    document.writeln(i + ":\t" + browser[i] + "<br>");
+  }
+}
+</script>
   </body>
 </html>
