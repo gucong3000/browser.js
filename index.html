@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="browserjs-v071" class="anchor" href="#browserjs-v071" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>browser.js v0.7.1</h1>
+<a id="browserjs-v08" class="anchor" href="#browserjs-v08" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>browser.js v0.8</h1>
 
 <h2>
 <a id="最靠谱的浏览器嗅探方式" class="anchor" href="#%E6%9C%80%E9%9D%A0%E8%B0%B1%E7%9A%84%E6%B5%8F%E8%A7%88%E5%99%A8%E5%97%85%E6%8E%A2%E6%96%B9%E5%BC%8F" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>最靠谱的浏览器嗅探方式</h2>
@@ -39,12 +39,6 @@ browser.WebKit          // Chrome或Safari等webkit内核浏览器下返回webki
 </code></pre>
 
 <h3>
-<a id="浏览器语言判断" class="anchor" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E8%AF%AD%E8%A8%80%E5%88%A4%E6%96%AD" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>浏览器语言判断</h3>
-
-<pre lang="Javescript"><code>browser.languages       // 返回浏览器语言，如`["zh-CN", "zh"]`
-</code></pre>
-
-<h3>
 <a id="平台判断" class="anchor" href="#%E5%B9%B3%E5%8F%B0%E5%88%A4%E6%96%AD" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>平台判断</h3>
 
 <pre lang="Javescript"><code>browser.Android         // Android卓版本号
@@ -58,15 +52,33 @@ browser.Windows         // Windows版本号
 </code></pre>
 
 <h3>
+<a id="其他" class="anchor" href="#%E5%85%B6%E4%BB%96" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>其他</h3>
+
+<pre lang="Javescript"><code>browser.languages       // 返回浏览器语言，如`["zh-CN", "zh"]`
+browser.prefix          // 已修正的拥有私有属性的对象，及修正后的属性名
+</code></pre>
+
+<h3>
 <a id="特性" class="anchor" href="#%E7%89%B9%E6%80%A7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>特性：</h3>
 
 <ul>
-<li>修正各浏览器的DOM属性名称私有属性前缀</li>
-<li>支持IE5-IE11、Webkit、Gecko、Presto内核浏览器</li>
-<li>遵循define.amd\define.cmd标准，使用RequireJS或seajs时，自动注册为其匿名模块</li>
-<li>没有define函数时，优先注册为$.browser或者window.browser</li>
+<li>利用DOM特征来判断浏览器，修改UserAgent不影响判断的准确性</li>
 <li>能获取版本号的浏览器或内核的版本号时，优先返回版本号，无版本号返回bool值</li>
+<li>修正各浏览器DOM的私有属性前缀</li>
+<li>遵循amd/umd标准模块规范，当不能注册为js模块时，会依次尝试注册为jQuery插件、全局变量</li>
 </ul>
+
+<h3>
+<a id="用例" class="anchor" href="#%E7%94%A8%E4%BE%8B" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>用例</h3>
+
+<pre><code>// 全屏播放视频，不用再写三种前缀，两种"S"大小写一大堆if判断
+vadio.requestFullscreen();
+
+if(browser.rv &gt; browser.MSIE){
+    alert("您的IE没有处于标准文档模式");
+}
+
+</code></pre>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/gucong3000/browser.js">Browser.js</a> is maintained by <a href="https://github.com/gucong3000">gucong3000</a>.</span>
