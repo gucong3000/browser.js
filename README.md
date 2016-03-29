@@ -3,6 +3,8 @@ browser.js v0.8
 
 最靠谱的浏览器嗅探方式
 --------------------------------------
+[![Build Status](https://travis-ci.org/gucong3000/browser.js.svg?branch=master)](https://travis-ci.org/gucong3000/browser.js)
+
 ### 浏览器内核判断
 ```Javescript
 browser.Chrome			// Chrome和基于Chromium二次开发的浏览器中返回Chrome版本号
