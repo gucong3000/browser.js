@@ -14,4 +14,4 @@ node_js:
   - "iojs"
 before_script:
   - npm i
-script: npm test
+script: npm t
