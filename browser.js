@@ -12,6 +12,7 @@
  */
 
 (function(root, factory) {
+	"use strict";
 	/* global define, exports, module */
 	if (typeof define === "function" && define.amd) {
 		// AMD. Register as an anonymous module.
