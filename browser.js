@@ -1,5 +1,5 @@
-/* browser.js
- * https://github.com/gucong3000/browser.js
+/** ! browser.js
+ * https://github.com/gucong3000/browser.js#readme
  */
 /*
  * define.amd存在时自动注册为其匿名模块
@@ -51,7 +51,7 @@
 		rv,
 		jscript = (function() {
 			// 微软的JScript语言独有的条件注释语句,！！！勿删！！！返回js引擎的版本号
-			/*@cc_on return @_jscript_version;@*/
+			/* @cc_on return @_jscript_version;@*/
 
 			// IE11不再使用JScript语言，改用document.documentMode
 			if (documentMode > 10 && isMs()) {
@@ -85,10 +85,10 @@
 		 *	有compatMode，说明IE6以上
 		 */
 
-		//IE版本，MSIE为文档模式，version为浏览器版本
+		// IE版本，MSIE为文档模式，version为浏览器版本
 		rv = jscript > 8 ? jscript : compatMode ? "XMLHttpRequest" in win ? documentMode ? 8 : 7 : 6 : 5;
 
-		//result.MSIE直接采用document.documentMode，IE6\7浏览器按高版IE的documentMode规则计算
+		// result.MSIE直接采用document.documentMode，IE6\7浏览器按高版IE的documentMode规则计算
 		result = {
 			MSIE: documentMode || (compatMode === "CSS1Compat" ? rv : 5),
 			rv: rv
@@ -213,7 +213,7 @@
 		});
 	}
 
-	/**************************************
+	/** ************************************
 	 * Properties
 	 **************************************/
 	var reSubPrapName = /([a-z]+[A-Z][a-z]+)[A-Z][a-z]*$/,
