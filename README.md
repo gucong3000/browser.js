@@ -3,6 +3,8 @@ browser.js v0.8
 
 最靠谱的浏览器嗅探方式
 --------------------------------------
+[![Build Status](https://travis-ci.org/gucong3000/browser.js.svg?branch=master)](https://travis-ci.org/gucong3000/browser.js)
+
 ### 浏览器内核判断
 ```Javescript
 browser.Chrome			// Chrome和基于Chromium二次开发的浏览器中返回Chrome版本号
@@ -12,7 +14,7 @@ browser.MSIE			// IE下返回IE的文档模式，怪癖模式返回5
 browser.rv				// IE下返回真实的IE版本号
 browser.Opera			// Opera下 返回Opera版本号
 browser.Safari			// Safari下返回Safari版本号(Maxthon算基于Safari开发的浏览器)
-browser.WebKit			// Chrome或Safari等webkit内核浏览器下返回webkit版本号
+browser.Webkit			// Chrome或Safari等webkit内核浏览器下返回webkit版本号
 ```
 
 ### 平台判断
