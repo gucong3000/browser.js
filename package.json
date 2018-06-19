@@ -3,10 +3,6 @@
   "version": "0.8.0",
   "description": "JavaScript library for browser info",
   "main": "Gruntfile.js",
-  "devDependencies": {
-    "eslint": "^3.19.0",
-    "uglify-js": "^2.8.22"
-  },
   "scripts": {
     "build": "uglifyjs --compress --mangle --comments \"/^\\**\\s*[!@]/i\" --output browser.min.js -- browser.js",
     "test": "eslint browser.js"
@@ -16,12 +12,23 @@
     "url": "git+https://github.com/gucong3000/browser.js.git"
   },
   "keywords": [
-    "browser"
+    "browser",
+    "documentMode",
+    "prefix"
   ],
   "author": "gucong",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/gucong3000/browser.js/issues"
   },
-  "homepage": "https://github.com/gucong3000/browser.js#readme"
+  "homepage": "https://github.com/gucong3000/browser.js#readme",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "uglify-js": "^3.4.0"
+  }
 }

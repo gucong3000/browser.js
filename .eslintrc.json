@@ -1,79 +1,73 @@
 {
-  "env": {
-    "amd": true,
-    "browser": true
-  },
-  "globals": {
-    "opera": true
-  },
-  "root": true,
-  "rules": {
-    "arrow-spacing": [
-      "error"
-    ],
-    "comma-spacing": [
-      "error"
-    ],
-    "curly": [
-      "error"
-    ],
-    "eqeqeq": [
-      "error",
-      "smart"
-    ],
-    "indent": [
-      "warn",
-      "tab",
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "keyword-spacing": [
-      "error"
-    ],
-    "no-eq-null": [
-      "error"
-    ],
-    "no-unused-expressions": [
-      "error"
-    ],
-    "no-caller": [
-      "error"
-    ],
-    "quotes": [
-      "error",
-      "double"
-    ],
-    "semi": [
-      "error",
-      "always",
-      {
-        "omitLastInOneLineBlock": false
-      }
-    ],
-    "space-before-blocks": [
-      "error",
-      "always"
-    ],
-    "space-infix-ops": [
-      "error"
-    ],
-    "spaced-comment": [
-      "error",
-      "always"
-    ],
-    "strict": [
-      "error",
-      "safe"
-    ],
-    "no-undef": [
-      "error"
-    ],
-    "no-unused-vars": [
-      "error"
-    ],
-    "no-eval": [
-      "error"
-    ]
-  }
+	"parserOptions": {
+		"sourceType": "script",
+		"impliedStrict": false
+	},
+	"env": {
+		"amd": true,
+		"browser": true,
+		"es6": false,
+		"node": false
+	},
+	"extends": [
+		"standard"
+	],
+	"root": true,
+	"rules": {
+		"comma-dangle": [
+			"error",
+			"never"
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"no-tabs": [
+			"off"
+		],
+		"quotes": [
+			"error",
+			"double"
+		],
+		"semi": [
+			"error",
+			"always",
+			{
+				"omitLastInOneLineBlock": false
+			}
+		],
+		"strict": [
+			"error",
+			"safe"
+		],
+		"one-var": [
+			"off"
+		]
+	},
+	"overrides": [
+		{
+			"files": [
+				"**/*.mjs",
+				"**/*.jsx"
+			],
+			"parserOptions": {
+				"sourceType": "module"
+			}
+		},
+		{
+			"files": [
+				"**/test/**/*"
+			],
+			"env": {
+				"mocha": true
+			},
+			"rules": {
+				"no-unused-expressions": "off",
+				"no-template-curly-in-string": "off"
+			}
+		}
+	]
 }
