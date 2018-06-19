@@ -1,0 +1,25 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = tab
+indent_size = 2
+insert_final_newline = true
+tab_width = 4
+trim_trailing_whitespace = true
+block_comment_start = /*
+block_comment = *
+block_comment_end = */
+
+[*.{cmd,bat}]
+end_of_line = crlf
+
+[{lerna.json,package-lock.json,package.json,*.yml}]
+indent_style = space
+
+[**/test/fixtures/*]
+indent_style = unset
